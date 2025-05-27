@@ -25,7 +25,7 @@ import org.conscrypt.Conscrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bitflip.executors.Parallel;
+import com.bitflip.executors.ParallelCpu;
 import com.bitflip.utils.Constant;
 import com.bitflip.utils.TestUtils;
 
@@ -42,17 +42,19 @@ public class BitFlipperApp {
 		} else {
 			publicKeyBytes = TestUtils.readData(Constant.RSA, "public.key");
 		}
-
-		if (findAlgortihm(publicKeyBytes).equals(Constant.RSA)) {
+		PublicKey publicKey = findAlgortihm(publicKeyBytes);
+		if (publicKey!=null && 	publicKey.getAlgorithm().equals(Constant.RSA)) {
 			// rsaPublicKeyDetailsByVendor(publicKeyBytes);
-			Parallel parallel= new Parallel();
-			parallel.start(publicKeyBytes);
+			ParallelCpu cpu= new ParallelCpu();
+			cpu.start(publicKey);
+			cpu.calculatePrimeNumbers();
 		}
 	}
 
 	
-	private static String findAlgortihm(byte[] publicKeyBytes) {
+	private static PublicKey findAlgortihm(byte[] publicKeyBytes) {
 		for (String each : Constant.algorithms) {
+			PublicKey publicKey=null;
 			try {
 				X509EncodedKeySpec spec = new X509EncodedKeySpec(publicKeyBytes);
 				KeyFactory factory;
@@ -62,9 +64,10 @@ public class BitFlipperApp {
 				} else {
 					factory = KeyFactory.getInstance(each);
 				}
-				PublicKey publicKey = factory.generatePublic(spec);
-				return each;
+				publicKey = factory.generatePublic(spec);
+				return publicKey;
 			} catch (Exception silentIgnore) {
+				publicKey=null;
 			}
 		}
 		throw new RuntimeException("Unknown key algorithm or unsupported format");
