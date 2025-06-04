@@ -1,5 +1,8 @@
 package com.bitflip.utils;
 
+import static java.math.BigInteger.TWO;
+
+import java.math.BigInteger;
 import java.util.List;
 
 public class Constant {
@@ -30,5 +33,8 @@ public class Constant {
 	public static final String RSA_ECB_OAEPWithSHA_1AndMGF1Padding= "RSA/ECB/OAEPWithSHA-1AndMGF1Padding";
 	public static final String RSA_ECB_OAEPWithSHA_256AndMGF1Padding= "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 	public static final String RSA_ECB_NoPadding= "RSA/ECB/NoPadding";
+	public static final BigInteger SQRT_2048 = TWO.pow(2047).sqrt();
+	public static final BigInteger SQRT_3072 = TWO.pow(3071).sqrt();
+	public static final BigInteger SQRT_4096 = TWO.pow(4095).sqrt();
 	
 }

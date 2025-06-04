@@ -47,7 +47,6 @@ public class BitFlipperApp {
 			// rsaPublicKeyDetailsByVendor(publicKeyBytes);
 			ParallelCpu cpu= new ParallelCpu();
 			cpu.start(publicKey);
-			cpu.calculatePrimeNumbers();
 		}
 	}
 
