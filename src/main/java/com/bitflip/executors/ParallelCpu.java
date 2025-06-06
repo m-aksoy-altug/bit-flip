@@ -182,6 +182,7 @@ public class ParallelCpu {
 
 	private static boolean isRelativePrime(BigInteger e, BigInteger bi) {
 		// optimize for common known public exponent prime values
+		// The public exponent-value F4 = 65537. & The public-exponent value F0 = 3.
 		if (e.compareTo(RSAKeyGenParameterSpec.F4) == 0 || e.compareTo(RSAKeyGenParameterSpec.F0) == 0) {
 			return !bi.mod(e).equals(ZERO);
 		} else {

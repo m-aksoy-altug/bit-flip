@@ -9,9 +9,50 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
+		<jcuda.jcudaVersion>12.6.0</jcuda.jcudaVersion>
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>org.jcuda</groupId>
+			<artifactId>jcuda</artifactId>
+			<version>${jcuda.jcudaVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jcuda</groupId>
+			<artifactId>jcuda-natives</artifactId>
+			<version>${jcuda.jcudaVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jcuda</groupId>
+			<artifactId>jcublas</artifactId>
+			<version>${jcuda.jcudaVersion}</version>
+		</dependency>
+		<!--<dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcufft</artifactId>
+            <version>${jcuda.jcudaVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcurand</artifactId>
+            <version>${jcuda.jcudaVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcusparse</artifactId>
+            <version>${jcuda.jcudaVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcusolver</artifactId>
+            <version>${jcuda.jcudaVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcudnn</artifactId>
+            <version>${jcuda.jcudaVersion}</version>
+        </dependency>-->
+      <dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j2-impl</artifactId>
 			<version>2.23.1</version>

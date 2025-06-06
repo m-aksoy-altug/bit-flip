@@ -25,6 +25,7 @@ import org.conscrypt.Conscrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bitflip.cuda.CudaGpu;
 import com.bitflip.executors.ParallelCpu;
 import com.bitflip.utils.Constant;
 import com.bitflip.utils.TestUtils;
@@ -34,6 +35,7 @@ public class BitFlipperApp {
 	private static final Logger log = LoggerFactory.getLogger(BitFlipperApp.class);
 
 	public static void main(String[] args) {
+		CudaGpu.start();		
 		Security.addProvider(new BouncyCastleProvider());
 		Security.insertProviderAt(Conscrypt.newProvider(), Security.getProviders().length + 1);
 		byte[] publicKeyBytes = null;
