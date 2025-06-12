@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bitflip.utils.TestUtils;
+import com.bitflip.utils.Utils;
 
 
 public class RsaBitFlipperTest {
@@ -43,12 +43,12 @@ public class RsaBitFlipperTest {
 		generator.initialize(2048); // 2048 bits = 256 bytes
 		KeyPair pair= generator.generateKeyPair();
 		PublicKey publicK= pair.getPublic();
-		TestUtils.writeData("RSA","public.key",publicK.getEncoded());
+		Utils.writeData("RSA","public.key",publicK.getEncoded());
 		byte[] publicKeyBytes = publicK.getEncoded();
 		log.info("Public Key (bytes): " + publicKeyBytes.length + " bytes");
 		log.info("Public Key (Base64):\n" + Base64.getEncoder().encodeToString(publicKeyBytes));
 		PrivateKey privateK=pair.getPrivate();
-		TestUtils.writeData("RSA","private.key",privateK.getEncoded());
+		Utils.writeData("RSA","private.key",privateK.getEncoded());
 		byte[] privateKeyBytes = privateK.getEncoded();
 		log.info("Private Key (bytes): " + privateKeyBytes.length + " bytes");
         log.info("Private Key (Base64):\n" + Base64.getEncoder().encodeToString(privateKeyBytes));
@@ -57,7 +57,7 @@ public class RsaBitFlipperTest {
 	@Test
 	public void encrytAndDecryptCipherWithPublicAndPrivateKey() throws Exception {
 		KeyFactory keyFactory= KeyFactory.getInstance("RSA"); // default SunRsaSign
-		byte[] publicKeyBytes= TestUtils.readData("RSA","public.key");
+		byte[] publicKeyBytes= Utils.readData("RSA","public.key");
 		X509EncodedKeySpec encodedKeySpec =new X509EncodedKeySpec(publicKeyBytes);
 		PublicKey publicKey =keyFactory.generatePublic(encodedKeySpec);
 		// Legacy Cipher: RSA/ECB/PKCS1Padding
@@ -68,7 +68,7 @@ public class RsaBitFlipperTest {
 		String encryptedMessage= Base64.getEncoder().encodeToString(encryptedMessageBytes);
 		log.info("encryptedMessage: "+ encryptedMessage);
 		
-		byte[] privateKeyBytes= TestUtils.readData("RSA","private.key");
+		byte[] privateKeyBytes= Utils.readData("RSA","private.key");
 		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
 		PrivateKey privateK = keyFactory.generatePrivate(keySpec);
 		Cipher decryptCipher= Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -82,7 +82,7 @@ public class RsaBitFlipperTest {
 	@Test
 	public void exploringRSApublicAndPrivateKeys() throws Exception {
 		KeyFactory keyFactory= KeyFactory.getInstance("RSA");
-		byte[] publicKeyBytes= TestUtils.readData("RSA","public.key");
+		byte[] publicKeyBytes= Utils.readData("RSA","public.key");
 		X509EncodedKeySpec encodedKeySpec =new X509EncodedKeySpec(publicKeyBytes);
 		PublicKey publicK =keyFactory.generatePublic(encodedKeySpec);
 		log.info("publicK.getAlgorithm(): "+ publicK.getAlgorithm()); // RSA
@@ -114,7 +114,7 @@ public class RsaBitFlipperTest {
 		// "1.1.1" : Specifies RSA Encryption (PKCS #1) Core RSA Standard 
 		// "1.1.4" : RSA with MD5 // "1.1.5" :  RSA with SHA-1 // "1.1.11" :  RSA with SHA-256
 		
-		byte[] privateKeyBytes= TestUtils.readData("RSA","private.key");
+		byte[] privateKeyBytes= Utils.readData("RSA","private.key");
 		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
 		PrivateKey privateK = keyFactory.generatePrivate(keySpec);
 		

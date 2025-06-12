@@ -28,27 +28,29 @@ import org.slf4j.LoggerFactory;
 import com.bitflip.cuda.CudaGpu;
 import com.bitflip.executors.ParallelCpu;
 import com.bitflip.utils.Constant;
-import com.bitflip.utils.TestUtils;
+import com.bitflip.utils.Utils;
 
 public class BitFlipperApp {
 	// exec:java -Dexec.mainClass="com.bitflip.BitFlipperApp"
+	// exec:java -Dexec.mainClass="com.bitflip.BitFlipperApp" -Dexec.args="" -Djava.library.path=./lib
 	private static final Logger log = LoggerFactory.getLogger(BitFlipperApp.class);
-
+	
+	 
 	public static void main(String[] args) {
-		CudaGpu.start();		
 		Security.addProvider(new BouncyCastleProvider());
 		Security.insertProviderAt(Conscrypt.newProvider(), Security.getProviders().length + 1);
 		byte[] publicKeyBytes = null;
-		if (args.length != 0) {
+		if (args.length > 0) {
 			publicKeyBytes = Base64.getDecoder().decode(args[0]);
 		} else {
-			publicKeyBytes = TestUtils.readData(Constant.RSA, "public.key");
+			publicKeyBytes = Utils.readData(Constant.RSA, "public.key");
 		}
 		PublicKey publicKey = findAlgortihm(publicKeyBytes);
 		if (publicKey!=null && 	publicKey.getAlgorithm().equals(Constant.RSA)) {
 			// rsaPublicKeyDetailsByVendor(publicKeyBytes);
-			ParallelCpu cpu= new ParallelCpu();
-			cpu.start(publicKey);
+//			ParallelCpu cpu= new ParallelCpu();
+//			cpu.start(publicKey);
+			CudaGpu.start(publicKey);
 		}
 	}
 

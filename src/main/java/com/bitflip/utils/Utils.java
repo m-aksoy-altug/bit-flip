@@ -16,7 +16,7 @@ import java.util.List;
 
 import com.sun.tools.javac.Main;
 
-public class TestUtils {
+public class Utils {
 	
 	public static void writeData(String path, String fileName, byte[] writeBytes) {
 		Path filePath= Paths.get(path,fileName);

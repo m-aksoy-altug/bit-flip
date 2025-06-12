@@ -1,5 +1,7 @@
 package com.bitflip.cuda;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -12,24 +14,31 @@ import org.slf4j.LoggerFactory;
 
 import jcuda.Pointer;
 import jcuda.Sizeof;
+import jcuda.jcublas.JCublas;
 import jcuda.jcublas.JCublas2;
 import jcuda.jcublas.cublasHandle;
 import jcuda.runtime.JCuda;
+import jcuda.runtime.cudaDeviceAttr;
 import jcuda.runtime.cudaDeviceProp;
 import jcuda.runtime.cudaEvent_t;
 import jcuda.runtime.cudaMemcpyKind;
 import jcuda.runtime.cudaStreamCallback;
 import jcuda.runtime.cudaStream_t;
 
- // https://github.com/jcuda/jcuda-samples
-public class CudaTest {
-	private static final Logger log = LoggerFactory.getLogger(CudaTest.class);
+
+/* - https://github.com/jcuda/jcuda-samples
+ * JCublas: Older version, requires GPU memory allocation/deallocation
+ * JCublas2: Basic Linear Algebra Subprograms
+*/
+public class CudaRunTimeTest {
+	private static final Logger log = LoggerFactory.getLogger(CudaRunTimeTest.class);
 	private static final int NUM_FLOATS = (1 << 22);
 	private static final int COPY_RUNS = 10;
 	@BeforeEach
 	public void setCuda() {
 	  JCuda.setExceptionsEnabled(true);
 	  JCublas2.setExceptionsEnabled(true);	
+	  JCublas.setExceptionsEnabled(true);
 	}
 	
 		
@@ -419,6 +428,70 @@ public class CudaTest {
         System.out.println("Done");
     }
 
+    
+    /**An example showing how to use Unified / Managed memory with the JCuda Runtime API */
+    @Test
+	public void voidJCudaRuntimeUnifiedMemory() {
+    	// Check if the device supports managed memory
+        int supported[] = { 0 };
+        JCuda.cudaDeviceGetAttribute(supported, cudaDeviceAttr.cudaDevAttrManagedMemory, 0);
+        if (supported[0] == 0){
+            System.err.println("Device does not support managed memory");
+            return;
+        }
+        
+     // Allocate managed memory that is accessible to the host
+        int n = 10;
+        long size = n * Sizeof.FLOAT;
+        Pointer p = new Pointer();
+        JCuda.cudaMallocManaged(p, size, JCuda.cudaMemAttachHost);
+
+        // Obtain the byte buffer from the pointer. This is supported only
+        // for memory that was allocated to be accessible on the host:
+        ByteBuffer bb = p.getByteBuffer(0, size);
+        
+        System.out.println("Buffer on host side: " + bb);
+
+        // Fill the buffer with sample data
+        FloatBuffer fb = bb.order(ByteOrder.nativeOrder()).asFloatBuffer();
+        float[] olderVersionTest = new float[n];
+        float ResultTest= 0.0f;
+        for (int i = 0; i < n; i++){
+            fb.put(i, i);
+            ResultTest+=i*i;
+            olderVersionTest[i]=i;
+        }
+        System.out.println("Test: " + ResultTest);
+        // Make the buffer accessible to all devices
+        JCuda.cudaStreamAttachMemAsync(null, p, 0, JCuda.cudaMemAttachGlobal);
+        JCuda.cudaStreamSynchronize(null);
+
+        // Use the pointer in a device operation (here, a dot product with 
+        // JCublas, for example). The data that was filled in by the host
+        // will now be used by the device.
+        cublasHandle handle = new cublasHandle();
+        JCublas2.cublasCreate(handle);
+        float result[] = { -1.0f };
+        // Dot product of the given numbers:  
+        JCublas2.cublasSdot(handle, n, p, 1, p, 1, Pointer.to(result));
+        System.out.println("Result: " + result[0]);
+        assertEquals(ResultTest, result[0]);
+        
+        // Older version:
+//        float[] hA = {1.0f, 2.0f, 3.0f};
+        Pointer dA = new Pointer();
+        JCuda.cudaMalloc(dA, olderVersionTest.length * Sizeof.FLOAT);
+        JCuda.cudaMemcpy(dA, Pointer.to(olderVersionTest), 
+        		olderVersionTest.length * Sizeof.FLOAT, cudaMemcpyKind.cudaMemcpyHostToDevice);
+
+        float resultolderVersion = JCublas.cublasSdot(n, dA, 1, dA, 1);
+        System.out.println("Older version Dot product: " + resultolderVersion);
+        assertEquals(resultolderVersion, result[0]);
+        JCuda.cudaFree(dA);
+   
+    }
+    
+    
     
 	@Test
 	public void getCudaDetails() throws Exception {

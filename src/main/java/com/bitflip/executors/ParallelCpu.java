@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.bitflip.BitFlipperApp;
 import com.bitflip.utils.Constant;
-import com.bitflip.utils.TestUtils;
+import com.bitflip.utils.Utils;
 
 public class ParallelCpu {
 
@@ -59,7 +59,7 @@ public class ParallelCpu {
 
 	public void start(PublicKey publicKey) {
 		String decryptedMessage = rsaEncryptionByPublicKey(publicKey);
-		byte[] privateKeyBytes = TestUtils.readData("RSA", "private.key");
+		byte[] privateKeyBytes = Utils.readData("RSA", "private.key");
 		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
 		try {
 			PrivateKey privateKey = keyFactoryBC.generatePrivate(keySpec);
@@ -190,7 +190,7 @@ public class ParallelCpu {
 		}
 	}
 
-	private static BigInteger getSqrt(int keySize) {
+	public static BigInteger getSqrt(int keySize) {
 		BigInteger sqrt;
 		switch (keySize) {
 		case 2048:
